@@ -22,3 +22,12 @@ where
         Err(_) => None,
     }
 }
+
+pub trait ReadWriteCloser {
+    fn encode(&self) -> Vec<u8>
+    where
+        Self: Sized + Serialize;
+    fn decode(bytes: Vec<u8>) -> Option<Self>
+    where
+        Self: Sized + Serialize + DeserializeOwned;
+}

@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 
 use crate::concurrency::{
-    acquire_excl, acquire_shared, acquire_upgradable, release_excl, release_shared,
-    release_upgradable, upgrade_shared, Synchronized,
+    rw_acquire_excl, rw_acquire_shared, rw_acquire_upgradable, rw_release_excl, rw_release_shared,
+    rw_release_upgradable, rw_upgrade_shared, RwSynchronized,
 };
 use crate::shared::{PageId, PAGE_SIZE};
 
@@ -53,53 +53,53 @@ impl PageInternal {
     }
 }
 
-pub type Page = Synchronized<PageInternal>;
+pub type Page = RwSynchronized<PageInternal>;
 
 #[inline]
 pub fn w_latch(page: &Page) {
     unsafe {
-        acquire_excl(&page);
+        rw_acquire_excl(&page);
     }
 }
 
 #[inline]
 pub fn w_unlatch(page: &Page) {
     unsafe {
-        release_excl(&page);
+        rw_release_excl(&page);
     }
 }
 
 #[inline]
 pub fn r_latch(page: &Page) {
     unsafe {
-        acquire_shared(&page);
+        rw_acquire_shared(&page);
     }
 }
 
 #[inline]
 pub fn r_unlatch(page: &Page) {
     unsafe {
-        release_shared(&page);
+        rw_release_shared(&page);
     }
 }
 
 #[inline]
 pub fn u_latch(page: &Page) {
     unsafe {
-        acquire_upgradable(&page);
+        rw_acquire_upgradable(&page);
     }
 }
 
 #[inline]
 pub fn u_unlatch(page: &Page) {
     unsafe {
-        release_upgradable(&page);
+        rw_release_upgradable(&page);
     }
 }
 
 #[inline]
 pub fn u_upgrade_latch(page: &Page) {
     unsafe {
-        upgrade_shared(&page);
+        rw_upgrade_shared(&page);
     }
 }
