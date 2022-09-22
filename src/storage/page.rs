@@ -8,7 +8,7 @@ use serde_with::serde_as;
 
 use crate::concurrency::{
     acquire_excl, acquire_shared, acquire_upgradable, release_excl, release_shared,
-    release_upgradable, Synchronized,
+    release_upgradable, upgrade_shared, Synchronized,
 };
 use crate::shared::{PageId, PAGE_SIZE};
 
@@ -94,5 +94,12 @@ pub fn u_latch(page: &Page) {
 pub fn u_unlatch(page: &Page) {
     unsafe {
         release_upgradable(&page);
+    }
+}
+
+#[inline]
+pub fn u_upgrade_latch(page: &Page) {
+    unsafe {
+        upgrade_shared(&page);
     }
 }
