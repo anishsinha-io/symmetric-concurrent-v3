@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use serde::Serialize;
 use std::env;
 use std::path::PathBuf;
 
@@ -14,4 +15,37 @@ pub const INVALID_PAGE_ID: isize = -1;
 
 pub fn cwd() -> std::io::Result<PathBuf> {
     env::current_dir()
+}
+
+use derivative::Derivative;
+use serde::Deserialize;
+use serde_with::serde_as;
+
+#[serde_as]
+#[derive(Serialize, Deserialize, Derivative, Clone, Copy)]
+#[derivative(Default)]
+pub struct Song {
+    // the default id value (-1) denotes that the struct is invalid. all valid songs must have a positive id
+    #[derivative(Default(value = "-1"))]
+    pub id: i32,
+    #[derivative(Default(value = "[0u8; 50]"))]
+    #[serde_as(as = "[_; 50]")]
+    pub title: [u8; 50],
+    #[derivative(Default(value = "[0u8; 50]"))]
+    #[serde_as(as = "[_; 50]")]
+    pub artist: [u8; 50],
+}
+
+impl Song {
+    pub fn new<'a>(id: i32, title: &'a str, artist: &'a str) -> Song {
+        let mut song_buf = [0u8; 50];
+        song_buf[..title.len()].copy_from_slice(title.as_bytes());
+        let mut artist_buf = [0u8; 50];
+        artist_buf[..artist.len()].copy_from_slice(artist.as_bytes());
+        return Song {
+            id,
+            title: song_buf,
+            artist: artist_buf,
+        };
+    }
 }
