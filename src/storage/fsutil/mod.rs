@@ -20,7 +20,6 @@ pub fn read_bytes(
     println!("HERE\n");
     handle.seek(SeekFrom::Start(offset))?;
     handle.read(buffer)?;
-    println!("HERE\n");
     Ok(())
 }
 
