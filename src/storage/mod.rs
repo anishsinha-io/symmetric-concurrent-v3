@@ -7,3 +7,4 @@ mod ioutil;
 mod lrureplacer;
 mod objptr;
 mod page;
+mod page_table;
