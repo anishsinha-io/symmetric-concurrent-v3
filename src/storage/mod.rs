@@ -4,6 +4,7 @@ mod diskmgr;
 mod fsutil;
 mod index_page;
 mod ioutil;
-mod lrureplacer;
 mod objptr;
 mod page;
+mod page_table;
+mod replacer;
