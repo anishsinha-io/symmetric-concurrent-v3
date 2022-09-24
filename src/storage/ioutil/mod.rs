@@ -1,8 +1,11 @@
+/// This file implements an IO API which includes functions to encode/decode arbitrary structures as long as they implement the
+/// required traits
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 use crate::shared::PAGE_SIZE;
 
+/// Used to encode a generic item to a vector of u8s as long as it implements the Sized and Serialize traits
 pub fn encode<T>(item: T) -> Option<Vec<u8>>
 where
     T: Sized + Serialize,
@@ -13,6 +16,7 @@ where
     None
 }
 
+/// Used to decode a vector of u8s into a generic item as long as it implements the Sized, Serialize, and DeserializeOwned traits
 pub fn decode<T>(bytes: Vec<u8>) -> Option<T>
 where
     T: Sized + Serialize + DeserializeOwned,
@@ -23,6 +27,7 @@ where
     None
 }
 
+/// Used to convert a generic item into a buffer of a static size that's writable by file APIs. Calls `encode` internally
 pub fn to_buffer<T>(item: T) -> Option<[u8; PAGE_SIZE]>
 where
     T: Sized + Serialize,
@@ -35,6 +40,7 @@ where
     None
 }
 
+/// Used to convert a buffer of a static size to a generic item. Calls `decode` internally
 pub fn from_buffer<T>(buf: [u8; PAGE_SIZE]) -> Option<T>
 where
     T: Sized + Serialize + DeserializeOwned,
