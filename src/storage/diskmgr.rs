@@ -1,15 +1,10 @@
-#![allow(dead_code, unused_imports)]
-
+#![allow(unused_imports)]
 use std::fs::{File, OpenOptions};
 use std::sync::Arc;
 
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
-
-use crate::concurrency::{acquire, release, Synchronized};
+use crate::concurrency::Synchronized;
 use crate::shared::{PageId, PAGE_SIZE};
 use crate::storage::fsutil::{read_bytes, write_bytes};
-use crate::storage::ioutil::{decode, encode, from_buffer, to_buffer};
-use crate::storage::page::Page;
 
 pub struct DiskMgrInternal {
     file_handle: Synchronized<File>,
