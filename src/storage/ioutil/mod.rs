@@ -41,7 +41,7 @@ where
 }
 
 /// Used to convert a buffer of a static size to a generic item. Calls `decode` internally
-pub fn from_buffer<T>(buf: [u8; PAGE_SIZE]) -> Option<T>
+pub fn from_buffer<T>(buf: &[u8; PAGE_SIZE]) -> Option<T>
 where
     T: Sized + Serialize + DeserializeOwned,
 {
@@ -68,7 +68,7 @@ mod tests {
     fn encode_decode_buffer() {
         let cry_baby = Song::new(1, "Cry Baby", "The Neighbourhood");
         let buf = to_buffer(cry_baby).unwrap();
-        let decoded = from_buffer::<Song>(buf).unwrap();
+        let decoded = from_buffer::<Song>(&buf).unwrap();
 
         assert_eq!(cry_baby.id, decoded.id);
         assert_eq!(cry_baby.artist, decoded.artist);
