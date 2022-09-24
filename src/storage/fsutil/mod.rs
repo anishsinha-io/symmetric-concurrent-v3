@@ -1,4 +1,4 @@
-#![allow(unused_imports)]
+// #![allow(unused_imports)]
 use std::fs::File;
 use std::io::SeekFrom;
 
@@ -30,7 +30,7 @@ mod tests {
 
     use super::*;
     use crate::shared::Song;
-    use crate::storage::ioutil::{decode, encode, from_buffer, to_buffer};
+    use crate::storage::ioutil::{from_buffer, to_buffer};
 
     const FSUTIL_TEST_PATH: &'static str =
         "/Users/anishsinha/Home/personal/research/symmetric-concurrent/symmetric-concurrent-v3/data/test/__fsutil__/fsutil.bin";
