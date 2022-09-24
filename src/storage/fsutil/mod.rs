@@ -5,10 +5,10 @@ use std::io::SeekFrom;
 use crate::shared::PAGE_SIZE;
 
 /// Used to write a buffer to a specified offset in the file handle passed in
-pub fn write_bytes(mut handle: &File, bytes: [u8; PAGE_SIZE], offset: u64) -> std::io::Result<()> {
+pub fn write_bytes(mut handle: &File, bytes: &[u8; PAGE_SIZE], offset: u64) -> std::io::Result<()> {
     use std::io::prelude::*;
     handle.seek(SeekFrom::Start(offset))?;
-    handle.write(&bytes)?;
+    handle.write(bytes)?;
     Ok(())
 }
 
@@ -72,19 +72,19 @@ mod tests {
             handle.set_len(0).unwrap();
             assert!(!write_bytes(
                 &handle,
-                cry_baby_buf,
+                &cry_baby_buf,
                 (cry_baby.id as u64 - 1u64) * PAGE_SIZE as u64
             )
             .is_err());
             assert!(!write_bytes(
                 &handle,
-                paris_buf,
+                &paris_buf,
                 (paris.id as u64 - 1u64) * PAGE_SIZE as u64
             )
             .is_err());
             assert!(!write_bytes(
                 &handle,
-                tangerine_buf,
+                &tangerine_buf,
                 (tangerine.id as u64 - 1u64) * PAGE_SIZE as u64
             )
             .is_err());
@@ -96,7 +96,7 @@ mod tests {
                 (cry_baby.id as u64 - 1) * PAGE_SIZE as u64,
             );
             assert!(!decoded_cry_baby_read_result.is_err());
-            let decoded_cry_baby = from_buffer::<Song>(decoded_cry_baby_buf).unwrap();
+            let decoded_cry_baby = from_buffer::<Song>(&decoded_cry_baby_buf).unwrap();
             assert_eq!(cry_baby.id, decoded_cry_baby.id);
             assert_eq!(cry_baby.title, decoded_cry_baby.title);
             assert_eq!(cry_baby.artist, decoded_cry_baby.artist);
@@ -108,7 +108,7 @@ mod tests {
                 (paris.id as u64 - 1) * PAGE_SIZE as u64,
             );
             assert!(!decoded_paris_read_result.is_err());
-            let decoded_paris = from_buffer::<Song>(decoded_paris_buf).unwrap();
+            let decoded_paris = from_buffer::<Song>(&decoded_paris_buf).unwrap();
 
             assert_eq!(paris.id, decoded_paris.id);
             assert_eq!(paris.title, decoded_paris.title);
@@ -121,7 +121,7 @@ mod tests {
                 (tangerine.id as u64 - 1) * PAGE_SIZE as u64,
             );
             assert!(!decoded_tangerine_read_result.is_err());
-            let decoded_tangerine = from_buffer::<Song>(decoded_tangerine_buf).unwrap();
+            let decoded_tangerine = from_buffer::<Song>(&decoded_tangerine_buf).unwrap();
 
             assert_eq!(tangerine.id, decoded_tangerine.id);
             assert_eq!(tangerine.title, decoded_tangerine.title);
@@ -146,7 +146,7 @@ mod tests {
 
             assert!(!write_bytes(
                 &handle,
-                you_found_me_buf,
+                &you_found_me_buf,
                 (you_found_me.id as u64) * PAGE_SIZE as u64
             )
             .is_err());
@@ -159,7 +159,7 @@ mod tests {
                 (you_found_me.id as u64) * PAGE_SIZE as u64,
             );
             assert!(!decoded_you_found_me_read_result.is_err());
-            let decoded_you_found_me = from_buffer::<Song>(decoded_you_found_me_buf).unwrap();
+            let decoded_you_found_me = from_buffer::<Song>(&decoded_you_found_me_buf).unwrap();
 
             assert_eq!(you_found_me.id, decoded_you_found_me.id);
             assert_eq!(you_found_me.title, decoded_you_found_me.title);
