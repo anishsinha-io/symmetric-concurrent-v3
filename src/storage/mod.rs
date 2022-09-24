@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 pub mod bufmgr;
-mod fs;
+mod diskmgr;
+mod fsutil;
 mod index_page;
 mod ioutil;
 mod lrureplacer;
