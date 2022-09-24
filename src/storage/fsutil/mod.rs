@@ -1,8 +1,10 @@
+/// This file implements a file API utilized primarily by the disk manager
 use std::fs::File;
 use std::io::SeekFrom;
 
 use crate::shared::PAGE_SIZE;
 
+/// Used to write a buffer to a specified offset in the file handle passed in
 pub fn write_bytes(mut handle: &File, bytes: [u8; PAGE_SIZE], offset: u64) -> std::io::Result<()> {
     use std::io::prelude::*;
     handle.seek(SeekFrom::Start(offset))?;
@@ -10,6 +12,7 @@ pub fn write_bytes(mut handle: &File, bytes: [u8; PAGE_SIZE], offset: u64) -> st
     Ok(())
 }
 
+/// Used to read from a specified offset, enough bytes to fill the passed in buffer
 pub fn read_bytes(
     mut handle: &File,
     buffer: &mut [u8; PAGE_SIZE],
@@ -36,6 +39,7 @@ mod tests {
         "/Users/anishsinha/Home/personal/research/symmetric-concurrent/symmetric-concurrent-v3/data/test/__fsutil__/fsutil.bin";
 
     lazy_static! {
+        /// Synchronized file handle for use in testing. It needs to be synchronized because Rust tests are run in parallel
         static ref TEST_FILE_HANDLE: Synchronized<File> = Arc::new(parking_lot::Mutex::new(
             OpenOptions::new()
                 .create(true)
@@ -49,6 +53,8 @@ mod tests {
 
     #[test]
     fn read_write_buffer() {
+        // Need an unsafe block to use acquire/release.
+        // TODO refactor to use a RAII guard. Unsafe acquire/release should only be used when latching internal data structures
         unsafe {
             acquire(&TEST_FILE_HANDLE);
             let handle = &(*TEST_FILE_HANDLE.data_ptr());
@@ -128,6 +134,8 @@ mod tests {
 
     #[test]
     fn read_write_unordered() {
+        // Need an unsafe block to use acquire/release.
+        // TODO refactor to use a RAII guard. Unsafe acquire/release should only be used when latching internal data structures
         unsafe {
             acquire(&TEST_FILE_HANDLE);
             let handle = &(*TEST_FILE_HANDLE.data_ptr());
