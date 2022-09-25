@@ -52,7 +52,7 @@ impl DiskMgrInternal {
         Ok(())
     }
 
-    pub fn clear_page(&self) -> std::io::Result<()> {
+    pub fn clear(&self) -> std::io::Result<()> {
         unsafe {
             (*self.file_handle.data_ptr()).set_len(0)?;
         }
@@ -92,7 +92,7 @@ mod tests {
         let internal = unsafe { &(*DISKMGR.data_ptr()) };
         let helium = Song::new(1, "Helium", "Glass Animals");
         let helium_buf = ioutil::to_buffer(helium).unwrap();
-        assert!(!internal.clear_page().is_err());
+        assert!(!internal.clear().is_err());
         assert!(!internal
             .write_page(helium.id as isize, &helium_buf)
             .is_err());

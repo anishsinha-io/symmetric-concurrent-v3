@@ -14,3 +14,4 @@ derivative = { version = "2.2.0" }
 rayon = "1.5.3"
 rand = "0.8.5"
 lazy_static = "1.4.0"
+chrono = "0.4.22"

@@ -15,7 +15,7 @@ use crate::shared::{PageId, PAGE_SIZE};
 #[serde_as]
 #[derive(Derivative, Deserialize, Serialize)]
 #[derivative(Default)]
-pub struct PageInternal {
+pub struct Page {
     #[serde_as(as = "[_; PAGE_SIZE]")]
     #[derivative(Default(value = "[0u8; PAGE_SIZE]"))]
     data: [u8; PAGE_SIZE],
@@ -27,11 +27,11 @@ pub struct PageInternal {
     dirty: bool,
 }
 
-impl PageInternal {
+impl Page {
     const PAGE_HEADER_SIZE: usize = 8;
 
     pub fn new() -> Self {
-        PageInternal::default()
+        Page::default()
     }
 
     #[inline]
@@ -53,53 +53,53 @@ impl PageInternal {
     }
 }
 
-pub type Page = RwSynchronized<PageInternal>;
+// pub type Page = RwSynchronized<PageInternal>;
 
-#[inline]
-pub fn w_latch(page: &Page) {
-    unsafe {
-        rw_acquire_excl(&page);
-    }
-}
+// #[inline]
+// pub fn w_latch(page: &Page) {
+//     unsafe {
+//         rw_acquire_excl(&page);
+//     }
+// }
 
-#[inline]
-pub fn w_unlatch(page: &Page) {
-    unsafe {
-        rw_release_excl(&page);
-    }
-}
+// #[inline]
+// pub fn w_unlatch(page: &Page) {
+//     unsafe {
+//         rw_release_excl(&page);
+//     }
+// }
 
-#[inline]
-pub fn r_latch(page: &Page) {
-    unsafe {
-        rw_acquire_shared(&page);
-    }
-}
+// #[inline]
+// pub fn r_latch(page: &Page) {
+//     unsafe {
+//         rw_acquire_shared(&page);
+//     }
+// }
 
-#[inline]
-pub fn r_unlatch(page: &Page) {
-    unsafe {
-        rw_release_shared(&page);
-    }
-}
+// #[inline]
+// pub fn r_unlatch(page: &Page) {
+//     unsafe {
+//         rw_release_shared(&page);
+//     }
+// }
 
-#[inline]
-pub fn u_latch(page: &Page) {
-    unsafe {
-        rw_acquire_upgradable(&page);
-    }
-}
+// #[inline]
+// pub fn u_latch(page: &Page) {
+//     unsafe {
+//         rw_acquire_upgradable(&page);
+//     }
+// }
 
-#[inline]
-pub fn u_unlatch(page: &Page) {
-    unsafe {
-        rw_release_upgradable(&page);
-    }
-}
+// #[inline]
+// pub fn u_unlatch(page: &Page) {
+//     unsafe {
+//         rw_release_upgradable(&page);
+//     }
+// }
 
-#[inline]
-pub fn u_upgrade_latch(page: &Page) {
-    unsafe {
-        rw_upgrade_shared(&page);
-    }
-}
+// #[inline]
+// pub fn u_upgrade_latch(page: &Page) {
+//     unsafe {
+//         rw_upgrade_shared(&page);
+//     }
+// }

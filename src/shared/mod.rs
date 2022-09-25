@@ -2,7 +2,6 @@
 
 use serde::Serialize;
 use std::env;
-use std::path::PathBuf;
 
 pub type FrameId = isize;
 pub type PageId = isize;
@@ -13,8 +12,8 @@ pub const PAGE_SIZE: usize = 4096;
 pub const INVALID_FRAME_ID: isize = -1;
 pub const INVALID_PAGE_ID: isize = -1;
 
-pub fn cwd() -> std::io::Result<PathBuf> {
-    env::current_dir()
+pub fn cwd() -> String {
+    String::from(env::current_dir().unwrap().to_str().unwrap())
 }
 
 use derivative::Derivative;
@@ -47,5 +46,17 @@ impl Song {
             title: song_buf,
             artist: artist_buf,
         };
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn path_to_dir() {
+        assert_eq!(
+            cwd(),
+            "/Users/anishsinha/Home/personal/research/symmetric-concurrent/symmetric-concurrent-v3"
+        );
     }
 }
