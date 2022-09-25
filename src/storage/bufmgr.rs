@@ -68,7 +68,7 @@ mod tests {
     use lazy_static::lazy_static;
     use std::sync::Arc;
 
-    use crate::shared::Song;
+    use crate::shared::{Song, PAGE_SIZE};
     use crate::storage::diskmgr::{DiskMgr, DiskMgrInternal};
     use crate::storage::ioutil;
     use crate::storage::page::Page;
@@ -139,11 +139,22 @@ mod tests {
     }
 
     #[test]
-    fn full_bufmgr_test() {
+    fn load_page() {
         let (mutex, condvar) = &**STATE;
         let mut prepared = mutex.lock();
         while !*prepared {
             condvar.wait(&mut prepared);
         }
+        assert!(*prepared);
+
+        let bufmgr = BUFMGR.read();
+        let diskmgr = &bufmgr.diskmgr;
+
+        let diskmgr_handle = unsafe { &(*diskmgr.data_ptr()) };
+        let mut page_buf = [0u8; PAGE_SIZE];
+        assert!(!diskmgr_handle.read_page(1, &mut page_buf).is_err());
     }
+
+    #[test]
+    fn full_bufmgr_test() {}
 }

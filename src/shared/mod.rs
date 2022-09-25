@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use serde::Serialize;
-use std::env;
+use std::{env, fmt::Display};
 
 pub type FrameId = isize;
 pub type PageId = isize;
@@ -46,6 +46,18 @@ impl Song {
             title: song_buf,
             artist: artist_buf,
         };
+    }
+}
+
+impl Display for Song {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Song [id={} title={} artist={}]",
+            self.id,
+            String::from_utf8_lossy(&self.title),
+            String::from_utf8_lossy(&self.artist)
+        )
     }
 }
 
