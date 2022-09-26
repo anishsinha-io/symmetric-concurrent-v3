@@ -1,10 +1,14 @@
 #![allow(dead_code, unused_imports)]
 
+use parking_lot::RawRwLock as _;
 use std::borrow::BorrowMut;
 use std::collections::{HashMap, LinkedList};
 use std::sync::Arc;
 
-use crate::concurrency::{RwSynchronized, Synchronized};
+use crate::concurrency::{
+    rw_acquire_upgradable, rw_release_excl, rw_release_upgradable, rw_upgrade_shared,
+    RwSynchronized, Synchronized,
+};
 use crate::shared::{FrameId, PageId, PAGE_SIZE};
 use crate::storage::diskmgr::DiskMgr;
 use crate::storage::free_list::FreeList;
@@ -59,12 +63,31 @@ impl BufferPoolInternal {
         }
     }
 
-    pub fn fetch_page(&self, page_id: PageId) -> std::io::Result<Page> {
+    pub fn fetch_page(&self, page_id: PageId) -> std::io::Result<FrameId> {
+        unsafe { rw_acquire_upgradable(&self.page_table) };
+        let page_table = unsafe { &mut *self.page_table.data_ptr() };
+        if let Some(frame_id) = page_table.get(&page_id) {
+            unsafe { rw_release_upgradable(&self.page_table) };
+            return Ok(*frame_id);
+        }
+        unsafe { rw_upgrade_shared(&self.page_table) };
         let diskmgr = self.diskmgr.read();
         let mut page_buf = [0u8; PAGE_SIZE];
         diskmgr.read_page(page_id, &mut page_buf)?;
         let page = Page::new(page_id, &page_buf);
-        Ok(page)
+        let mut free_list = self.free_list.write();
+        if free_list.len() > 0 {
+            let frame_res = free_list.pop_front();
+            assert!(!frame_res.is_none());
+            let frame_id = frame_res.unwrap();
+            page_table.insert(page_id, frame_id);
+            return Ok(frame_id);
+        } else {
+            // evict page using buffer pool policy
+        }
+        // page_table.insert(page_id, frame_id);
+        unsafe { rw_release_excl(&self.page_table) };
+        Ok(0)
     }
 }
 
