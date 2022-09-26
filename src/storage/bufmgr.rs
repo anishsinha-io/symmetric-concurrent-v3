@@ -11,7 +11,7 @@ use crate::storage::free_list::FreeList;
 use crate::storage::page::Page;
 use crate::storage::page_table::PageTable;
 
-use super::diskmgr::DiskMgrInternal;
+use super::diskmgr::{self, DiskMgrInternal};
 
 pub struct BufferPoolFrameInternal {
     frame_id: FrameId,
@@ -22,7 +22,7 @@ impl BufferPoolFrameInternal {
     fn new(frame_id: FrameId) -> Self {
         Self {
             frame_id,
-            page: Page::new(),
+            page: Page::default(),
         }
     }
 }
@@ -58,6 +58,14 @@ impl BufferPoolInternal {
             frames: Arc::new(parking_lot::RwLock::new(frames_internal)),
         }
     }
+
+    pub fn fetch_page(&self, page_id: PageId) -> std::io::Result<Page> {
+        let diskmgr = self.diskmgr.read();
+        let mut page_buf = [0u8; PAGE_SIZE];
+        diskmgr.read_page(page_id, &mut page_buf)?;
+        let page = Page::new(page_id, &page_buf);
+        Ok(page)
+    }
 }
 
 pub type BufferPool = RwSynchronized<BufferPoolInternal>;
@@ -87,7 +95,7 @@ mod tests {
                 ))),
             )));
         static ref STATE: Arc<(parking_lot::Mutex<bool>, parking_lot::Condvar)> =
-            Arc::new((parking_lot::Mutex::new(true), parking_lot::Condvar::new()));
+            Arc::new((parking_lot::Mutex::new(false), parking_lot::Condvar::new()));
     }
 
     #[test]
@@ -153,6 +161,10 @@ mod tests {
         let diskmgr_handle = unsafe { &(*diskmgr.data_ptr()) };
         let mut page_buf = [0u8; PAGE_SIZE];
         assert!(!diskmgr_handle.read_page(1, &mut page_buf).is_err());
+        let song = ioutil::from_buffer::<Song>(&page_buf);
+        assert!(!song.is_none());
+
+        let frames_handle = bufmgr.frames.write();
     }
 
     #[test]

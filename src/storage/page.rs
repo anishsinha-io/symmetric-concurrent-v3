@@ -30,8 +30,13 @@ pub struct Page {
 impl Page {
     const PAGE_HEADER_SIZE: usize = 8;
 
-    pub fn new() -> Self {
-        Page::default()
+    pub fn new(id: PageId, data: &[u8; PAGE_SIZE]) -> Self {
+        Page {
+            data: *data,
+            id,
+            pin_count: 0,
+            dirty: false,
+        }
     }
 
     #[inline]
@@ -44,12 +49,18 @@ impl Page {
         self.id
     }
 
+    #[inline]
     pub fn get_pin_count(&self) -> usize {
         self.pin_count
     }
 
+    #[inline]
     pub fn is_dirty(&self) -> bool {
         self.dirty
+    }
+
+    pub fn set_data(mut self, data: &[u8; PAGE_SIZE]) {
+        self.data = *data;
     }
 }
 
